@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule 
+	xmlns:json="http://www.mulesoft.org/schema/mule/json" 
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" 
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+
+	<flow name="locksGetRunTask"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/locks/runTask" allowedMethods="GET"/>
+		<apache-ignite:lock-scope doc:name="Lock - Scope"  lock="LOCK_1" timeout="#[message.inboundProperties['http.query.params'].timeout]" timeoutUnit="#[message.inboundProperties['http.query.params'].timeUnit]" manager-ref="Connection_manager">
+            <expression-component doc:name="Wait 10 seconds"><![CDATA[java.lang.Thread.currentThread().sleep(10000)]]></expression-component>
+		<set-payload value="{&quot;msg&quot;:&quot;process executed with lock acquired!!&quot;}" doc:name="Process Executed"  mimeType="application/json"/>
+		</apache-ignite:lock-scope>
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+        	<logger level="ERROR" doc:name="Logger"  message="Error captured"/>
+			<set-payload value="#['{&quot;msg&quot;:&quot;'+exception.cause.message+'&quot;}']" doc:name="Process Error"  mimeType="application/json"/>
+            <set-property propertyName="http.status" value="500" doc:name="http-status: 500"/>    
+        </catch-exception-strategy>
+	</flow>
+</mule>

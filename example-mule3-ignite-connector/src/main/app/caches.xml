@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule 
+	xmlns:json="http://www.mulesoft.org/schema/mule/json" 
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" 
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+	<flow name="cachesGetDataIngestion"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/caches/ingestPois"/>
+		<set-variable value="2" doc:name="numberOfIngesters"  variableName="numberOfIngesters"/>
+        <set-variable variableName="poisProvider" value="#[groovy: return new com.hawkore.ignite.connector.examples.dataproviders.PoisProvider(Integer.parseInt(message.getInboundProperty('http.query.params').count), message.getInboundProperty('http.query.params').cc, Integer.parseInt(message.getInboundProperty('http.query.params').initialId), Integer.parseInt(flowVars.numberOfIngesters))]" doc:name="Create poisPovider"/>
+		<apache-ignite:cache-ingest-data doc:name="Cache - Ingest data INTO pois cache"  config-ref="Apache_Ignite_Config" dataProvider-ref="#[flowVars.poisProvider]" cache="pois" numberOfIngesters="#[flowVars.numberOfIngesters]" batchSize="10000"/>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+	</flow>
+	<flow name="cachesGetSize"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/caches/size" allowedMethods="GET"/>
+		<apache-ignite:cache-instance cache="#[message.inboundProperties['http.query.params'].cache]" doc:name="Cache - Instance"  config-ref="Apache_Ignite_Config"/>
+		<set-payload value="#[payload.size]" doc:name="Set Payload"  />
+	</flow>
+	<flow name="cachesGetClear"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/caches/clear" allowedMethods="GET"/>
+		<apache-ignite:cache-clear cache="#[message.inboundProperties['http.query.params'].cache]" doc:name="Cache - Clear"  config-ref="Apache_Ignite_Config"/>
+		<apache-ignite:cache-instance cache="#[message.inboundProperties['http.query.params'].cache]" doc:name="Cache - Instance"  config-ref="Apache_Ignite_Config"/>
+		<set-payload value="#[payload.size]" doc:name="Set Payload"  />
+	</flow>
+	<flow name="cachesDeleteDel"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/caches/del" allowedMethods="DELETE"/>
+		<apache-ignite:cache-remove cache="CACHE2" doc:name="Cache - Remove"  config-ref="Apache_Ignite_Config" key-ref="#[message.inboundProperties['http.query.params'].key]"/>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+	</flow>
+	<flow name="cachesPutPut"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/caches/put" allowedMethods="PUT"/>
+		<apache-ignite:cache-put cache="CACHE2" doc:name="Cache - Put"  config-ref="Apache_Ignite_Config" key-ref="#[message.inboundProperties['http.query.params'].key]" value-ref="#[message.inboundProperties['http.query.params'].value]"/>
+		<set-payload value="#[&quot;Entry stored: key = &quot; + message.inboundProperties['http.query.params'].key + &quot;, val= &quot; + message.inboundProperties['http.query.params'].value]" doc:name="Set Payload"  />
+	</flow>
+	<flow name="cachesGetGet"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/caches/get" allowedMethods="GET"/>
+		<apache-ignite:cache-get cache="CACHE2" doc:name="Cache - Get"  config-ref="Apache_Ignite_Config" key-ref="#[message.inboundProperties['http.query.params'].key]"/>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+	</flow>
+	
+	
+</mule>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-project xmlns="http://www.mulesoft.com/tooling/project" runtimeId="org.mule.tooling.server.3.9.0" schemaVersion="5.3.0.0">
+    <name>example-mule3-ignite-connector</name>
+    <description></description>
+    <muleExtension name="Apache Ignite" qualifier="org.mule.tooling.ui.contribution.apache-ignite.3.8.0"/>
+</mule-project>

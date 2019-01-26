@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule 
+	xmlns:json="http://www.mulesoft.org/schema/mule/json" 
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" 
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+	<flow name="fileSystemCreateFile"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/create" allowedMethods="POST"/>
+		<set-variable value="#[groovy: return new java.io.ByteArrayInputStream(message.getInboundProperty('http.query.params').content.getBytes())]" doc:name="Create stream content"  variableName="content"/>
+		<apache-ignite:filesystem-create fileSystem="MY_IGFS" doc:name="FileSystem - Create"  config-ref="Apache_Ignite_Config" content-ref="#[flowVars.content]" path="#[message.inboundProperties['http.query.params'].path]"/>
+		<set-payload value='#["File successfully created!"]' doc:name="Set Payload"  mimeType="text/plain"/>
+	</flow>
+	<flow name="fileSystemCreateDirectories"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/mkdirs" allowedMethods="POST"/>
+		<apache-ignite:filesystem-mkdirs fileSystem="MY_IGFS" doc:name="FileSystem - Mkdirs"  config-ref="Apache_Ignite_Config" path="#[message.inboundProperties['http.query.params'].path]"/>
+		<set-payload value='#["Directories successfully created!"]' doc:name="Set Payload"  mimeType="text/plain"/>
+	</flow>	
+	<flow name="fileSystemDownloadFile"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/download" allowedMethods="GET"/>
+		<apache-ignite:filesystem-open doc:name="FileSystem - Open"  config-ref="Apache_Ignite_Config" path="#[message.inboundProperties['http.query.params'].path]" fileSystem="MY_IGFS"/>
+	</flow>		
+	<flow name="fileSystemFileSize"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/size" allowedMethods="GET"/>
+		<apache-ignite:filesystem-size fileSystem="MY_IGFS" doc:name="FileSystem - Size"  config-ref="Apache_Ignite_Config" path="#[message.inboundProperties['http.query.params'].path]"/>
+		<set-payload doc:name="Set Payload"  mimeType="text/plain" value="#[message.payload]"/>
+	</flow>		
+	<flow name="fileSystemList"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/ls" allowedMethods="GET" />
+		<apache-ignite:filesystem-list-files fileSystem="MY_IGFS" doc:name="FileSystem - List files"  config-ref="Apache_Ignite_Config" path="#[message.inboundProperties['http.query.params'].path]"/>
+		<json:object-to-json-transformer doc:name="Object to JSON"/>
+	</flow>	
+	<flow name="fileSystemFileDirSummary"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/summary" allowedMethods="GET"/>
+		<apache-ignite:filesystem-summary fileSystem="MY_IGFS" doc:name="FileSystem - Summary"  config-ref="Apache_Ignite_Config" path="#[message.inboundProperties['http.query.params'].path]"/>
+		<json:object-to-json-transformer doc:name="Object to JSON"/>
+	</flow>	
+	<flow name="fileSystemDeleteFileDir"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/rm" allowedMethods="DELETE"/>
+		<apache-ignite:filesystem-delete fileSystem="MY_IGFS" doc:name="FileSystem - Delete"  config-ref="Apache_Ignite_Config" path="#[message.inboundProperties['http.query.params'].path]" recursive="true"/>
+		<set-payload value='#["Successfully deleted"]' doc:name="Set Payload"  mimeType="text/plain"/>
+	</flow>		
+</mule>

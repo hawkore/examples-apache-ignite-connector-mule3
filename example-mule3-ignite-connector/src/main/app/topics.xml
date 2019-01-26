@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule 
+	xmlns:json="http://www.mulesoft.org/schema/mule/json" 
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" 
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+
+	<flow name="topicsFlow"  >
+		<apache-ignite:topic-listener topic="TOPIC1" doc:name="Topic - listener"  config-ref="Apache_Ignite_Config"/>
+		<logger level="INFO" doc:name="Logger"  message='#["message received on TOPIC1: " + payload]'/>
+	</flow>
+	<flow name="topicsFlow1"  >
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/topics/publish"/>
+		<apache-ignite:topic-publish topic="TOPIC1" doc:name="Topic - Publish"  config-ref="Apache_Ignite_Config" item-ref="#[message.inboundProperties['http.query.params'].message]"/>
+	</flow>
+</mule>

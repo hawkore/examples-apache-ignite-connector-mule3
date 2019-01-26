@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite" 
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+
+    <http:listener-config name="HTTP_Listener_config" host="0.0.0.0" port="8080" doc:name="HTTP Listener Configuration"/>
+
+	<apache-ignite:connection-manager name="Connection_manager" doc:name="Connection manager"  igniteSpringCfgFile="ignite/client/ignite-client-config.xml" connectToRemoteCluster="true" igniteInstanceName="example">
+		<apache-ignite:cache-defs >
+			<apache-ignite:cache-def cacheName="CACHE1" >
+				<apache-ignite:cache-config >
+					<apache-ignite:simple-cache-configuration />
+				</apache-ignite:cache-config>
+			</apache-ignite:cache-def>
+			<apache-ignite:cache-def cacheName="CACHE2" >
+				<apache-ignite:cache-config >
+					<apache-ignite:bean-reference-cache-config beanRef="_defaultCacheConfig" />
+				</apache-ignite:cache-config>
+			</apache-ignite:cache-def>
+		</apache-ignite:cache-defs>
+		<apache-ignite:set-defs >
+			<apache-ignite:set-def setName="SET1" >
+				<apache-ignite:collection-config >
+					<apache-ignite:simple-collection-configuration />
+				</apache-ignite:collection-config>
+			</apache-ignite:set-def>
+		</apache-ignite:set-defs>
+		<apache-ignite:queue-defs >
+			<apache-ignite:queue-def queueName="QUEUE1" >
+				<apache-ignite:collection-config >
+					<apache-ignite:simple-collection-configuration />
+				</apache-ignite:collection-config>
+			</apache-ignite:queue-def>
+			<apache-ignite:queue-def queueName="QUEUE2" >
+				<apache-ignite:collection-config >
+					<apache-ignite:bean-reference-collection-config beanRef="_defaultCollectionConfig" />
+				</apache-ignite:collection-config>
+			</apache-ignite:queue-def>
+		</apache-ignite:queue-defs>
+		<apache-ignite:topic-defs >
+			<apache-ignite:topic-def topicName="TOPIC1" />
+		</apache-ignite:topic-defs>
+		<apache-ignite:atomic-long-defs >
+			<apache-ignite:atomic-long-def atomicName="ATOMIC_LONG_1" >
+				<apache-ignite:atomic-config >
+					<apache-ignite:simple-atomic-configuration />
+				</apache-ignite:atomic-config>
+			</apache-ignite:atomic-long-def>
+		</apache-ignite:atomic-long-defs>
+		<apache-ignite:atomic-reference-defs >
+			<apache-ignite:atomic-reference-def atomicName="ATOMIC_REFERENCE_1" >
+				<apache-ignite:atomic-config >
+					<apache-ignite:simple-atomic-configuration />
+				</apache-ignite:atomic-config>
+			</apache-ignite:atomic-reference-def>
+		</apache-ignite:atomic-reference-defs>
+		<apache-ignite:atomic-sequence-defs >
+			<apache-ignite:atomic-sequence-def atomicName="ATOMIC_SEQUENCE_1" >
+				<apache-ignite:atomic-config >
+					<apache-ignite:simple-atomic-configuration />
+				</apache-ignite:atomic-config>
+			</apache-ignite:atomic-sequence-def>
+		</apache-ignite:atomic-sequence-defs>
+		<apache-ignite:atomic-stamped-defs >
+			<apache-ignite:atomic-stamped-def atomicName="ATOMIC_STAMPED_1" >
+				<apache-ignite:atomic-config >
+					<apache-ignite:simple-atomic-configuration />
+				</apache-ignite:atomic-config>
+			</apache-ignite:atomic-stamped-def>
+		</apache-ignite:atomic-stamped-defs>
+		<apache-ignite:lock-defs >
+			<apache-ignite:lock-def lockName="LOCK_1" />
+		</apache-ignite:lock-defs>
+		<apache-ignite:semaphore-defs >
+			<apache-ignite:semaphore-def semaphoreName="SEM_1" count="1" />
+		</apache-ignite:semaphore-defs>
+		<apache-ignite:countdownlatch-defs >
+			<apache-ignite:countdownlatch-def countdownLatchName="COUNT_DOWN_1" count="10" />
+		</apache-ignite:countdownlatch-defs>
+	</apache-ignite:connection-manager>
+	<apache-ignite:config name="Apache_Ignite_Config" doc:name="Apache Ignite Config" manager-ref="Connection_manager">
+	</apache-ignite:config>
+	<apache-ignite:cache-scope-strategy name="Cache_scope_strategy" doc:name="Cache scope strategy"  entryTTL="10" manager-ref="Connection_manager" >
+		<apache-ignite:cache-def cacheName="A_CACHE_FOR_CACHE_SCOPE_STRATEGY" >
+			<apache-ignite:cache-config >
+				<apache-ignite:simple-cache-configuration atomicityMode="TRANSACTIONAL" >
+					<apache-ignite:client-near-cache-eviction-policy maxSize="10" />
+				</apache-ignite:simple-cache-configuration>
+			</apache-ignite:cache-config>
+		</apache-ignite:cache-def>
+	</apache-ignite:cache-scope-strategy>
+</mule>
