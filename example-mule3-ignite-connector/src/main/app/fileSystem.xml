@@ -43,12 +43,20 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 	<flow name="fileSystemList"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/ls" allowedMethods="GET" />
 		<apache-ignite:filesystem-list-files fileSystem="MY_IGFS" doc:name="FileSystem - List files"  config-ref="Apache_Ignite_Config" path="#[message.inboundProperties['http.query.params'].path]"/>
-		<json:object-to-json-transformer doc:name="Object to JSON"/>
+		<json:object-to-json-transformer doc:name="Object to JSON">
+            <json:serialization-mixin mixinClass="com.hawkore.ignite.connector.examples.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsFile"/>
+            <json:serialization-mixin mixinClass="com.hawkore.ignite.connector.examples.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPath"/>
+        </json:object-to-json-transformer>
 	</flow>	
 	<flow name="fileSystemFileDirSummary"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/summary" allowedMethods="GET"/>
 		<apache-ignite:filesystem-summary fileSystem="MY_IGFS" doc:name="FileSystem - Summary"  config-ref="Apache_Ignite_Config" path="#[message.inboundProperties['http.query.params'].path]"/>
-		<json:object-to-json-transformer doc:name="Object to JSON"/>
+		<json:object-to-json-transformer doc:name="Object to JSON">
+            <json:serialization-mixin mixinClass="com.hawkore.ignite.connector.examples.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsFile"/>
+            <json:serialization-mixin mixinClass="com.hawkore.ignite.connector.examples.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPath"/>
+            <json:serialization-mixin mixinClass="com.hawkore.ignite.connector.examples.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPathSummary"/>
+        </json:object-to-json-transformer>
+
 	</flow>	
 	<flow name="fileSystemDeleteFileDir"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/rm" allowedMethods="DELETE"/>
