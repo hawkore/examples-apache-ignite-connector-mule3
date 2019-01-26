@@ -37,7 +37,6 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 	<flow name="fileSystemFileSize"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/size" allowedMethods="GET"/>
 		<apache-ignite:filesystem-size fileSystem="MY_IGFS" doc:name="FileSystem - Size"  config-ref="Apache_Ignite_Config" path="#[message.inboundProperties['http.query.params'].path]"/>
-		<set-payload doc:name="Set Payload"  mimeType="text/plain" value="#[message.payload]"/>
         <object-to-string-transformer doc:name="Object to String"/>
 	</flow>		
 	<flow name="fileSystemList"  >
