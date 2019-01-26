@@ -22,8 +22,8 @@ Hi! This is Hawkore's Apache Ignite connector for Mule 3 samples project.
 
 * `ignite-server-node-test`: Start server nodes for testing Hawkore's Apache Ignite connector. See [README.md](ignite-server-node-test/README.md) for more info.
 
-* `examples-mule3-ignite-connector`: Sample mule 3 application for testing [Hawkore's Apache Ignite connector for Mule 3
-](https://docs.hawkore.com/private/apache-ignite-connector-mule3/). See [README.md](examples-mule3-ignite-connector/README.md) for more info.
+* `example-mule3-ignite-connector`: Sample mule 3 application for testing [Hawkore's Apache Ignite connector for Mule 3
+](https://docs.hawkore.com/private/apache-ignite-connector-mule3/). See [README.md](example-mule3-ignite-connector/README.md) for more info.
 
 # Other resources
 
