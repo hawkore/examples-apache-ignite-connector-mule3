@@ -27,13 +27,18 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 		<set-payload value='#["Directories successfully created!"]' doc:name="Set Payload"  mimeType="text/plain"/>
 	</flow>	
 	<flow name="fileSystemDownloadFile"  >
-		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/download" allowedMethods="GET"/>
+		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/download" allowedMethods="GET">
+            <http:response-builder>
+                <http:header headerName="Content-Type" value="application/octet-stream"/>
+            </http:response-builder>
+        </http:listener>
 		<apache-ignite:filesystem-open doc:name="FileSystem - Open"  config-ref="Apache_Ignite_Config" path="#[message.inboundProperties['http.query.params'].path]" fileSystem="MY_IGFS"/>
 	</flow>		
 	<flow name="fileSystemFileSize"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/size" allowedMethods="GET"/>
 		<apache-ignite:filesystem-size fileSystem="MY_IGFS" doc:name="FileSystem - Size"  config-ref="Apache_Ignite_Config" path="#[message.inboundProperties['http.query.params'].path]"/>
 		<set-payload doc:name="Set Payload"  mimeType="text/plain" value="#[message.payload]"/>
+        <object-to-string-transformer doc:name="Object to String"/>
 	</flow>		
 	<flow name="fileSystemList"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/filesystem/ls" allowedMethods="GET" />

@@ -16,11 +16,11 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
 
-	<flow name="topicsFlow"  >
+	<flow name="TOPIC1_listener"  >
 		<apache-ignite:topic-listener topic="TOPIC1" doc:name="Topic - listener"  config-ref="Apache_Ignite_Config"/>
 		<logger level="INFO" doc:name="Logger"  message='#["message received on TOPIC1: " + payload]'/>
 	</flow>
-	<flow name="topicsFlow1"  >
+	<flow name="topicsPublish"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/topics/publish"/>
 		<apache-ignite:topic-publish topic="TOPIC1" doc:name="Topic - Publish"  config-ref="Apache_Ignite_Config" item-ref="#[message.inboundProperties['http.query.params'].message]"/>
 	</flow>

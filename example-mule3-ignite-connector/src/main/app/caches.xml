@@ -15,38 +15,47 @@ http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
-	<flow name="cachesGetDataIngestion"  >
+	<flow name="cachesDataIngestion"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/caches/ingestPois"/>
 		<set-variable value="2" doc:name="numberOfIngesters"  variableName="numberOfIngesters"/>
         <set-variable variableName="poisProvider" value="#[groovy: return new com.hawkore.ignite.connector.examples.dataproviders.PoisProvider(Integer.parseInt(message.getInboundProperty('http.query.params').count), message.getInboundProperty('http.query.params').cc, Integer.parseInt(message.getInboundProperty('http.query.params').initialId), Integer.parseInt(flowVars.numberOfIngesters))]" doc:name="Create poisPovider"/>
 		<apache-ignite:cache-ingest-data doc:name="Cache - Ingest data INTO pois cache"  config-ref="Apache_Ignite_Config" dataProvider-ref="#[flowVars.poisProvider]" cache="pois" numberOfIngesters="#[flowVars.numberOfIngesters]" batchSize="10000"/>
         <json:object-to-json-transformer doc:name="Object to JSON"/>
 	</flow>
-	<flow name="cachesGetSize"  >
+	<flow name="cachesSize"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/caches/size" allowedMethods="GET"/>
 		<apache-ignite:cache-instance cache="#[message.inboundProperties['http.query.params'].cache]" doc:name="Cache - Instance"  config-ref="Apache_Ignite_Config"/>
 		<set-payload value="#[payload.size]" doc:name="Set Payload"  />
+		<json:object-to-json-transformer doc:name="Object to JSON"/>
 	</flow>
-	<flow name="cachesGetClear"  >
+	<flow name="cachesClear"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/caches/clear" allowedMethods="GET"/>
 		<apache-ignite:cache-clear cache="#[message.inboundProperties['http.query.params'].cache]" doc:name="Cache - Clear"  config-ref="Apache_Ignite_Config"/>
 		<apache-ignite:cache-instance cache="#[message.inboundProperties['http.query.params'].cache]" doc:name="Cache - Instance"  config-ref="Apache_Ignite_Config"/>
 		<set-payload value="#[payload.size]" doc:name="Set Payload"  />
+		<json:object-to-json-transformer doc:name="Object to JSON"/>
 	</flow>
-	<flow name="cachesDeleteDel"  >
+	<flow name="cachesDelete"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/caches/del" allowedMethods="DELETE"/>
 		<apache-ignite:cache-remove cache="CACHE2" doc:name="Cache - Remove"  config-ref="Apache_Ignite_Config" key-ref="#[message.inboundProperties['http.query.params'].key]"/>
         <json:object-to-json-transformer doc:name="Object to JSON"/>
 	</flow>
-	<flow name="cachesPutPut"  >
+	<flow name="cachesPut"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/caches/put" allowedMethods="PUT"/>
 		<apache-ignite:cache-put cache="CACHE2" doc:name="Cache - Put"  config-ref="Apache_Ignite_Config" key-ref="#[message.inboundProperties['http.query.params'].key]" value-ref="#[message.inboundProperties['http.query.params'].value]"/>
 		<set-payload value="#[&quot;Entry stored: key = &quot; + message.inboundProperties['http.query.params'].key + &quot;, val= &quot; + message.inboundProperties['http.query.params'].value]" doc:name="Set Payload"  />
 	</flow>
-	<flow name="cachesGetGet"  >
+	<flow name="cachesGet"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/caches/get" allowedMethods="GET"/>
 		<apache-ignite:cache-get cache="CACHE2" doc:name="Cache - Get"  config-ref="Apache_Ignite_Config" key-ref="#[message.inboundProperties['http.query.params'].key]"/>
-        <json:object-to-json-transformer doc:name="Object to JSON"/>
+        <choice doc:name="Choice">
+            <when expression="#[payload != null]">
+                <json:object-to-json-transformer doc:name="Object to JSON"/>
+            </when>
+            <otherwise>
+                <set-payload value="#['']" doc:name="Set Payload"/>
+            </otherwise>
+        </choice>
 	</flow>
 	
 	

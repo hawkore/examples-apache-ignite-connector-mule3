@@ -33,11 +33,11 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 		<apache-ignite:queue-ingest-data queue="QUEUE2" doc:name="Queue - Ingest data into QUEUE2"  config-ref="Apache_Ignite_Config" dataProvider-ref="#[flowVars.entitiesProvider]" numberOfIngesters="#[flowVars.numberOfIngesters]"/>
         <json:object-to-json-transformer doc:name="Object to JSON"/>
 	</flow>
-	<flow name="queuesFlow"  >
+	<flow name="QueuePublish"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/queues/publish"/>
 		<apache-ignite:queue-publish queue="QUEUE1" doc:name="Queue - publish to QUEUE1"  config-ref="Apache_Ignite_Config" item-ref="#[message.inboundProperties['http.query.params'].message]"/>
 	</flow>
-	<flow name="queuesFlow1"  >
+	<flow name="QueuePublishConsume"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/queues/publishConsume"/>
 		<apache-ignite:queue-publish-consume queue="QUEUE1" doc:name="Queue - publish and consume a message to/from QUEUE1"  config-ref="Apache_Ignite_Config" item-ref="#[message.inboundProperties['http.query.params'].message]"/>
 	</flow>
