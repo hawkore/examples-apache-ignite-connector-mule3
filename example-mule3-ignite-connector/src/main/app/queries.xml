@@ -55,12 +55,10 @@ return search().refresh(true)
             .sort(geoDistance("place", 40.416775, -3.703790)).build();]]></scripting:script>
         </scripting:transformer>
         <set-variable variableName="luceneQuery" value="#[payload]" doc:name="set variable luceneQuery"/>
-        <apache-ignite:cache-scope key-ref="#['sql search ' + message.inboundProperties['http.query.params'].query + message.inboundProperties['http.query.params'].lang]" strategy-ref="Cache_scope_strategy" doc:name="Cache - Scope">
-            <apache-ignite:query-sql config-ref="Apache_Ignite_Config" sqlQuery="SELECT id, countryCode, public.hkmv_text(name, ?, public.HKMV_DEFAULT_ISO(name)) as name, public.hkmv_text(description, ?, public.HKMV_DEFAULT_ISO(description)) as description, public.hkmv_text(name, 'iata', null) as iata, PUBLIC.ST_DISTANCE_SPHERE(place, 'POINT (-3.703790 40.416775)')/1000 as distance_km FROM &quot;pois&quot;.poi  WHERE lucene = ?" queryParams-ref="#[[message.inboundProperties['http.query.params'].lang, message.inboundProperties['http.query.params'].lang, flowVars.luceneQuery]]" doc:name="Query - SQL">
-                <apache-ignite:page pageSize="#[message.inboundProperties['http.query.params'].limit]" pageNumber="#[message.inboundProperties['http.query.params'].pageNumber]"/>
-            </apache-ignite:query-sql>
-            <json:object-to-json-transformer doc:name="Object to JSON"/>
-        </apache-ignite:cache-scope>
+        <apache-ignite:query-sql config-ref="Apache_Ignite_Config" sqlQuery="SELECT id, countryCode, public.hkmv_text(name, ?, public.HKMV_DEFAULT_ISO(name)) as name, public.hkmv_text(description, ?, public.HKMV_DEFAULT_ISO(description)) as description, public.hkmv_text(name, 'iata', null) as iata, PUBLIC.ST_DISTANCE_SPHERE(place, 'POINT (-3.703790 40.416775)')/1000 as distance_km FROM &quot;pois&quot;.poi  WHERE lucene = ?" queryParams-ref="#[[message.inboundProperties['http.query.params'].lang, message.inboundProperties['http.query.params'].lang, flowVars.luceneQuery]]" doc:name="Query - SQL">
+            <apache-ignite:page pageSize="#[message.inboundProperties['http.query.params'].limit]" pageNumber="#[message.inboundProperties['http.query.params'].pageNumber]"/>
+        </apache-ignite:query-sql>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
 	</flow>
 	<flow name="queriesGetPoisByTextSql"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" allowedMethods="GET" path="/queries/pois/sqlSearch">
@@ -78,7 +76,7 @@ FROM &quot;pois&quot;.poi
 WHERE lucene = ?">
 			<apache-ignite:page pageNumber="#[message.inboundProperties['http.query.params'].pageNumber]" pageSize="#[message.inboundProperties['http.query.params'].limit]" />
 		</apache-ignite:query-sql>
-        <json:object-to-json-transformer doc:name="Object to JSON"/>
+        <json:object-to-json-transformer doc:name="Sample caching JSON String"/>
 		</apache-ignite:cache-scope>
 	</flow>
 	<flow name="queriesGetPoisByTextText"  >
@@ -89,9 +87,9 @@ WHERE lucene = ?">
 		</http:listener>		
 		<apache-ignite:cache-scope doc:name="Cache - scope"  key-ref="#['text search ' + message.inboundProperties['http.query.params'].query]" strategy-ref="Cache_scope_strategy">
             <apache-ignite:query-lucene config-ref="Apache_Ignite_Config" tableId="&quot;pois&quot;.poi" luceneQuery="#[message.inboundProperties['http.query.params'].query]" maxResults="#[message.inboundProperties['http.query.params'].limit]" doc:name="Query - Lucene"/>
-            <scripting:transformer doc:name="Object To JSON">
-                <scripting:script engine="Groovy"><![CDATA[return com.hawkore.ignite.cache.serialization.serializers.SerializationManager.toJson(message.payload)]]></scripting:script>
-            </scripting:transformer>
 		</apache-ignite:cache-scope>
+        <scripting:transformer doc:name="Object To JSON">
+            <scripting:script engine="Groovy"><![CDATA[return com.hawkore.ignite.cache.serialization.serializers.SerializationManager.toJson(message.payload)]]></scripting:script>
+        </scripting:transformer>
 	</flow>
 </mule>
