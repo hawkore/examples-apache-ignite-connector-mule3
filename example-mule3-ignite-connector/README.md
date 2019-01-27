@@ -7,9 +7,13 @@ This maven project contains sample source code for [Hawkore's Apache Ignite conn
 
 ### Steps for testing
 
-- 1. Download the latest version of Anypoint Studio 6 and import this project as an `Anypoint Studio project from File System`. After finishing it's compilation, run it as a `Mule Application`.
+- 1. Download and install the latest version of Anypoint Studio 6.
+- 2. Install Hawkore's Apache Ignite Connector for Mule 3 on Anypoint studio:
+	- Go to Anypoint studio's Menu: Help > Install new software. **Work with**: https://p2repo.hawkore.com/m1/apache-ignite-connector/update-site , press **Add** and enter a name, for example "Hawkore's Apache Ignite Connector". Select the plugin and install it. After install it you will be prompted to restart Anypoint studio.
 
-- 2. Test operations with [Postman](https://www.getpostman.com/apps). Open Postman and send below requests (view code for more samples). Change port if you have modified the HTTP Listener Config (Global Configuration):
+- 3. Once Anypoint studio is restarted, import this project as an `Anypoint Studio project from External Location`. After finishing it's compilation, run it as a `Mule Application with Maven`.
+
+- 4. Test operations with [Postman](https://www.getpostman.com/apps). Open Postman and send below requests (view code for more samples). Change port if you have modified the HTTP Listener Config (Global Configuration):
 
 	- Prepare some data:
 		- Data ingestion into CACHE: GET http://localhost:8080/caches/ingestPois?cc=ES&count=100000&initialId=0
