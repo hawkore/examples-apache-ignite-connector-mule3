@@ -57,7 +57,11 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
     </http:listener>
     <apache-ignite:filesystem-delete config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
       recursive="#[payload.recursive]" doc:name="ign: filesystem-delete" />
-    <json:object-to-json-transformer doc:name="toJson" />
+	<json:object-to-json-transformer doc:name="toJson">
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsFile"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPath"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPathSummary"/>
+     </json:object-to-json-transformer>
     <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
   </flow>
 
@@ -70,7 +74,11 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
     </http:listener>
     <apache-ignite:filesystem-exists config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
       doc:name="ign: filesystem-exists" />
-    <json:object-to-json-transformer doc:name="toJson" />
+	<json:object-to-json-transformer doc:name="toJson">
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsFile"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPath"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPathSummary"/>
+     </json:object-to-json-transformer>
     <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
   </flow>
 
@@ -96,7 +104,11 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
     </http:listener>
     <apache-ignite:filesystem-info config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
       doc:name="ign: filesystem-info" />
-    <json:object-to-json-transformer doc:name="toJson" />
+	<json:object-to-json-transformer doc:name="toJson">
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsFile"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPath"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPathSummary"/>
+     </json:object-to-json-transformer>
     <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
   </flow>
 
@@ -109,7 +121,11 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
     </http:listener>
     <apache-ignite:filesystem-list-files config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
       path="#[payload.path]" doc:name="ign: filesystem-list-liles" />
-    <json:object-to-json-transformer doc:name="toJson" />
+	<json:object-to-json-transformer doc:name="toJson">
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsFile"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPath"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPathSummary"/>
+     </json:object-to-json-transformer>
     <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
   </flow>
 
@@ -122,7 +138,11 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
     </http:listener>
     <apache-ignite:filesystem-list-paths config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
       path="#[payload.path]" doc:name="ign: filesystem-list-paths" />
-    <json:object-to-json-transformer doc:name="toJson" />
+	<json:object-to-json-transformer doc:name="toJson">
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsFile"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPath"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPathSummary"/>
+     </json:object-to-json-transformer>
     <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
   </flow>
 
@@ -161,7 +181,11 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
     <set-payload value="#[com.hawkore.IOUtils.toString(flowVars.stream)]" doc:name="payload: read file" />
     <apache-ignite:filesystem-close-stream stream-ref="#[flowVars.stream]" doc:name="ign: close-stream"
       config-ref="ignConfig" />
-    <json:object-to-json-transformer doc:name="toJson" />
+	<json:object-to-json-transformer doc:name="toJson">
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsFile"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPath"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPathSummary"/>
+     </json:object-to-json-transformer>
     <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
   </flow>
 
@@ -201,7 +225,11 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
     </http:listener>
     <apache-ignite:filesystem-size config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
       doc:name="ign: filesystem-size" />
-    <json:object-to-json-transformer doc:name="toJson" />
+	<json:object-to-json-transformer doc:name="toJson">
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsFile"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPath"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPathSummary"/>
+     </json:object-to-json-transformer>
     <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
   </flow>
 
@@ -209,12 +237,16 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
     <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemSummary" allowedMethods="POST"
       doc:name="http-in: POST /filesystemSummary">
       <http:response-builder>
-        <http:header headerName="Content-Type" value="text/plain" />
+        <http:header headerName="Content-Type" value="application/json" />
       </http:response-builder>
     </http:listener>
     <apache-ignite:filesystem-summary config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
       doc:name="ign: filesystem-summary" />
-    <json:object-to-json-transformer doc:name="toJson" />
+	<json:object-to-json-transformer doc:name="toJson">
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsFile"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPath"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPathSummary"/>
+     </json:object-to-json-transformer>
     <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
   </flow>
 
@@ -235,7 +267,11 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
       doc:name="ign: filesystem-update">
       <apache-ignite:properties ref="#[flowVars.properties]" />
     </apache-ignite:filesystem-update>
-    <json:object-to-json-transformer doc:name="toJson" />
+	<json:object-to-json-transformer doc:name="toJson">
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsFile"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPath"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPathSummary"/>
+    </json:object-to-json-transformer>
     <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
   </flow>
 
@@ -248,7 +284,11 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
     </http:listener>
     <apache-ignite:filesystem-used-space-size config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
       doc:name="ign: filesystem--used-space-size" />
-    <json:object-to-json-transformer doc:name="toJson" />
+	<json:object-to-json-transformer doc:name="toJson">
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsFile"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPath"/>
+           <json:serialization-mixin mixinClass="com.hawkore.MixInForIgnoreType" targetClass="org.apache.ignite.igfs.IgfsPathSummary"/>
+    </json:object-to-json-transformer>
     <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
   </flow>
 
