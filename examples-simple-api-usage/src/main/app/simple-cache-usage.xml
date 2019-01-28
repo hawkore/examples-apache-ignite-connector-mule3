@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+  xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+  xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+
+  <flow name="cacheInstance">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/cacheInstance" allowedMethods="POST"
+      doc:name="http-in: POST /cacheInstance">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:cache-instance config-ref="ignConfig" cache="#[payload.cache]" doc:name="ign: cache-instance" />
+    <set-payload value="#[payload.toString()]" doc:name="payload: ok!" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+
+  <flow name="cachePut">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/cachePut" allowedMethods="POST"
+      doc:name="http-in: POST /cachePut" />
+    <apache-ignite:cache-put config-ref="ignConfig" cache="#[payload.cache]" key-ref="#[payload.key]"
+      value-ref="#[payload.value]" mustSerialize="#[payload.mustSerialize]" async="#[payload.async]"
+      doc:name="ign: cache-put" />
+    <set-payload value="ok!" doc:name="payload: ok!" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="cacheGet">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/cacheGet" allowedMethods="POST"
+      doc:name="http-in: POST /cacheGet" />
+    <apache-ignite:cache-get config-ref="ignConfig" cache="#[payload.cache]" key-ref="#[payload.key]"
+      mustDeserialize="#[payload.mustDeserialize]" doc:name="ign: cache-get" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="cacheContains">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/cacheContains" allowedMethods="POST"
+      doc:name="http-in: POST /cacheContains" />
+    <apache-ignite:cache-contains config-ref="ignConfig" cache="#[payload.cache]" key-ref="#[payload.key]"
+      doc:name="ign: cache-contains" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="cacheClear">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/cacheClear" allowedMethods="POST"
+      doc:name="http-in: POST /cacheClear" />
+    <apache-ignite:cache-clear config-ref="ignConfig" cache="#[payload.cache]" doc:name="ign: cache-contains" />
+    <set-payload value="ok!" doc:name="payload: ok!" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="cacheReplaceIfExists">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/cacheReplaceIfExists" allowedMethods="POST"
+      doc:name="http-in: POST /cacheReplaceIfExists" />
+    <apache-ignite:cache-replace-if-exists config-ref="ignConfig" cache="#[payload.cache]" key-ref="#[payload.key]"
+      value-ref="#[payload.value]" mustSerialize="#[payload.mustSerialize]" doc:name="ign: cache-replace-if-exists" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="cacheReplaceIfEquals">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/cacheReplaceIfEquals" allowedMethods="POST"
+      doc:name="http-in: POST /cacheReplaceIfEquals" />
+    <apache-ignite:cache-replace-if-equals config-ref="ignConfig" cache="#[payload.cache]" key-ref="#[payload.key]"
+      value-ref="#[payload.value]" expectedValue-ref="#[payload.expectedValue]" mustSerialize="#[payload.mustSerialize]"
+      doc:name="ign: cache-replace-if-equals" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="cacheRemove">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/cacheRemove" allowedMethods="POST"
+      doc:name="http-in: POST /cacheRemove" />
+    <apache-ignite:cache-remove config-ref="ignConfig" cache="#[payload.cache]" key-ref="#[payload.key]"
+      async="#[payload.async]" doc:name="ign: cache-remove" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="cacheIngestData">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/cacheIngestData" allowedMethods="POST"
+      doc:name="http-in: POST /cacheIngestData" />
+    <apache-ignite:cache-ingest-data config-ref="ignConfig" cache="#[payload.cache]"
+      dataProvider-ref="#[new com.hawkore.mule.apacheignite.example.rt.CacheIngestDataProvider(payload.data)]"
+      mustSerialize="#[payload.mustSerialize]" async="#[payload.async]" allowOverwrite="#[payload.allowOverwrite]"
+      autoFlushFreq="#[payload.autoFlushFreq]" batchSize="#[payload.batchSize]"
+      numberOfIngesters="#[payload.numberOfIngesters]" doc:name="ign: cache-ingest-data" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="cacheScope">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/cacheScope" allowedMethods="POST"
+      doc:name="http-in: POST /cacheScope" />
+    <apache-ignite:cache-scope strategy-ref="cacheScopeStrategy"
+      noCacheFilter-ref="#[&quot;true&quot;.equals(payload.noCacheFilter)]" key-ref="#[payload.key]"
+      doc:name="ign: cache-scope">
+      <set-payload value="#[payload.key]-#[java.lang.System.currentTimeMillis()]" doc:name="payload: key+epoch" />
+    </apache-ignite:cache-scope>
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+</mule>

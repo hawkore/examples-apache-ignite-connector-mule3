@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+  xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd">
+
+  <flow name="batchFlow">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/batch" allowedMethods="POST"
+      doc:name="http-in: /batch">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:batch doc:name="Batch" strategy-ref="batchStrategy1">
+      <apache-ignite:batch-input doc:name="Batch Input">
+        <set-payload value="#[payload.items.split(':')]" doc:name="Set Payload" />
+      </apache-ignite:batch-input>
+      <apache-ignite:batch-step doc:name="Batch Step">
+        <set-payload value="#[message.payload]-1" doc:name="Set Payload" />
+        <logger message="#[message.payload]" level="INFO" doc:name="log: payload" />
+      </apache-ignite:batch-step>
+      <apache-ignite:batch-step doc:name="Batch Step">
+        <set-payload value="#[message.payload]-2" doc:name="Set Payload" />
+        <logger message="#[message.payload]" level="INFO" doc:name="log: payload" />
+      </apache-ignite:batch-step>
+      <apache-ignite:batch-on-complete doc:name="Batch On Complete">
+        <apache-ignite:atomic-reference-set config-ref="ignConfig" atomic="BATCH" mustSerialize="true"
+          doc:name="ign: atomref-set" />
+        <json:object-to-json-transformer doc:name="Object to JSON" />
+        <logger message="#[message.payload]" level="INFO" doc:name="log: payload" />
+      </apache-ignite:batch-on-complete>
+    </apache-ignite:batch>
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="batch_getOnCompleteFlow">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/batch_getOnComplete" allowedMethods="POST"
+      doc:name="http-in: /batch_getOnComplete">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-reference-get config-ref="ignConfig" atomic="BATCH" mustDeserialize="true"
+      doc:name="Apache Ignite" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="batchFlow2">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/batch2" doc:name="HTTP">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <set-payload value="#[{'Hola', 'Adios'}]" doc:name="Set Payload" />
+    <apache-ignite:batch doc:name="Batch" strategy-ref="batchStrategy2">
+      <apache-ignite:batch-input doc:name="Batch Input">
+        <set-payload value="#[{'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10'}]" doc:name="Set Payload" />
+      </apache-ignite:batch-input>
+      <apache-ignite:batch-step doc:name="Batch Step">
+        <set-payload value="#[message.payload]-BBB" doc:name="Set Payload" />
+        <logger message="#[message.payload]" level="INFO" doc:name="log: payload" />
+      </apache-ignite:batch-step>
+      <apache-ignite:batch-step doc:name="Batch Step">
+        <set-payload value="#[message.payload]-CCC" doc:name="Set Payload" />
+        <logger message="#[message.payload]" level="INFO" doc:name="log: payload" />
+      </apache-ignite:batch-step>
+      <apache-ignite:batch-on-complete doc:name="Batch On Complete">
+        <json:object-to-json-transformer doc:name="Object to JSON" />
+        <logger message="#[message.payload]" level="INFO" doc:name="log: payload" />
+      </apache-ignite:batch-on-complete>
+    </apache-ignite:batch>
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+</mule>

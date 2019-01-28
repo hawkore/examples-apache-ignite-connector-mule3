@@ -25,6 +25,9 @@ Hi! This is Hawkore's Apache Ignite connector for Mule 3 samples project.
 * `example-mule3-ignite-connector`: Sample mule 3 application for testing [Hawkore's Apache Ignite connector for Mule 3
 ](https://docs.hawkore.com/private/apache-ignite-connector-mule3/). See [README.md](example-mule3-ignite-connector/README.md) for more info.
 
+* `examples-simple-api-usage`: this examples wraps most connector operations and lets you invoke them by
+using very simple web forms. See [README.md](examples-simple-api-usage/README.md).
+
 # Other resources
 
 Sign up at [www.hawkore.com](https://www.hawkore.com) to access full documentation.

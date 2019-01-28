@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+  xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+  <flow name="countdownlatchAwait">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/countdownlatchAwait" allowedMethods="POST"
+      doc:name="http-in: POST /countdownlatchAwait">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:countdownlatch-await config-ref="ignConfig" countdownlatch="#[payload.countdownlatch]"
+      timeout="#[payload.timeout]" timeoutUnit="#[payload.timeoutUnit]" doc:name="ign: countdownlatch-await" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+
+  <flow name="countdownlatchCountDown">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/countdownlatchCountDown" allowedMethods="POST"
+      doc:name="http-in: POST /countdownlatchCountDown" />
+    <apache-ignite:countdownlatch-count-down config-ref="ignConfig" countdownlatch="#[payload.countdownlatch]"
+      down="#[payload.down]" doc:name="ign: countdownlatch-count-down" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+</mule>

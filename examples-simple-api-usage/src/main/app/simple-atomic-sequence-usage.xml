@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+  xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd">
+
+  <flow name="atomicSequenceGet">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicSequenceGet" allowedMethods="POST"
+      doc:name="http-in: /atomicSequenceGet">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-sequence-get doc:name="atomseq: get" atomic="#[payload.atomic]" config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="atomicSequenceAddAndGet">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicSequenceAddAndGet" allowedMethods="POST"
+      doc:name="http-in: /atomicSequenceAddAndGet">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-sequence-add-and-get doc:name="atomseq: add-and-get" valueToAdd="#[payload.valueToAdd]"
+      atomic="#[payload.atomic]" config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="atomicSequenceGetAndAdd">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicSequenceGetAndAdd" allowedMethods="POST"
+      doc:name="http-in: /atomicSequenceGetAndAdd">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-sequence-get-and-add doc:name="atomseq: get-and-add" valueToAdd="#[payload.valueToAdd]"
+      atomic="#[payload.atomic]" config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="atomicSequenceGetAndIncrement">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicSequenceGetAndIncrement" allowedMethods="POST"
+      doc:name="http-in: /atomicSequenceGetAndIncrement">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-sequence-get-and-increment doc:name="atomseq: get-and-increment" atomic="#[payload.atomic]"
+      config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="atomicSequenceIncrementAndGet">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicSequenceIncrementAndGet" allowedMethods="POST"
+      doc:name="http-in: /atomicSequenceIncrementAndGet">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-sequence-increment-and-get doc:name="atomseq: increment-and-get" atomic="#[payload.atomic]"
+      config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+</mule>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite" xmlns:json="http://www.mulesoft.org/schema/mule/json"
+  xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+  <flow name="setInstance">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/setInstance" allowedMethods="POST"
+      doc:name="http-in: POST /setInstance">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:set-instance config-ref="ignConfig" set="#[payload.set]" doc:name="ign: set-instance" />
+    <set-payload value="#[payload.toString()]" doc:name="payload:true" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="setAdd">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/setAdd" allowedMethods="POST"
+      doc:name="http-in: POST /setAdd">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:set-add config-ref="ignConfig" set="#[payload.set]" item-ref="#[payload.item]"
+      mustSerialize="#[payload.mustSerialize]" doc:name="ign: set-add" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="setRemove">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/setRemove" allowedMethods="POST"
+      doc:name="http-in: POST /setRemove">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:set-remove config-ref="ignConfig" set="#[payload.set]" item-ref="#[payload.item]"
+      mustSerialize="#[payload.mustSerialize]" doc:name="ign: set-remove" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="setContains">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/setContains" allowedMethods="POST"
+      doc:name="http-in: POST /setContains">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:set-contains config-ref="ignConfig" set="#[payload.set]" item-ref="#[payload.item]"
+      mustSerialize="#[payload.mustSerialize]" doc:name="ign: set-contains" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="setClear">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/setClear" allowedMethods="POST"
+      doc:name="http-in: POST /setClear">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:set-clear config-ref="ignConfig" set="#[payload.set]" doc:name="ign: set-clear" />
+    <set-payload value="{&quot;res&quot;:&quot;success!&quot;}" mimeType="application/json" doc:name="payload: success!" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="setIterator">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/setIterator" allowedMethods="POST"
+      doc:name="http-in: POST /setIterator">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <set-variable variableName="items" value="#[new java.util.ArrayList()]" doc:name="var: items" />
+    <apache-ignite:set-iterator config-ref="ignConfig" set="#[payload.set]" doc:name="ign: set-iterator" />
+    <foreach collection="#[payload]" doc:name="For Each">
+      <expression-component doc:name="expr: add item"><![CDATA[flowVars.items.add(payload)]]></expression-component>
+    </foreach>
+    <set-payload value="#[flowVars.items]" doc:name="payload: items" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+</mule>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+  xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite" xmlns:json="http://www.mulesoft.org/schema/mule/json"
+  xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
+  <flow name="simple-lock-usageFlow">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/lockInstance" allowedMethods="POST"
+      doc:name="http-in: POST /lockInstance">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="text/plain" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:lock-instance config-ref="ignConfig" lock="#[payload.lock]" doc:name="Lock - Instance" />
+    <set-payload value="#[payload.toString()]" doc:name="payload: payload.toString()" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="lockScope">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/lockScope" allowedMethods="POST"
+      doc:name="http-in: POST /lockScope">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:lock-scope lock="#[payload.lock]" doc:name="lockScope" manager-ref="ignite1" timeout="#[payload.timeout]" timeoutUnit="#[payload.timeoutUnit]">
+        <expression-component doc:name="expr: sleep"><![CDATA[Thread.sleep(payload.holdMillis)]]></expression-component>
+    </apache-ignite:lock-scope>
+    <set-payload value="{&quot;res&quot;:&quot;success!&quot;}" doc:name="payload: ok!" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="lockScope2">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/lockScope2" allowedMethods="POST"
+      doc:name="http-in: POST /lockScope2">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <flow-ref name="lockScope" doc:name="fref: lockLockAndUnlock" />
+  </flow>
+
+</mule>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+  xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+  xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+
+  <flow name="transactionalScope">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/transactionalScope" allowedMethods="POST"
+      doc:name="http-in: POST /transactionalScope" />
+    <set-variable variableName="cache" value="#[payload.cache]" doc:name="var: cache" />
+    <set-variable variableName="fail" value="#[payload.fail]" doc:name="var: fail" />
+    <set-variable variableName="key1" value="#[payload.key1]" doc:name="var: key1" />
+    <set-variable variableName="key2" value="#[payload.key2]" doc:name="var: key2" />
+    <set-variable variableName="val1" value="#[payload.val1]" doc:name="var: val1" />
+    <set-variable variableName="val2" value="#[payload.val2]" doc:name="var: val2" />
+    <apache-ignite:cache-remove config-ref="ignConfig" cache="#[flowVars.cache]" key-ref="#[flowVars.key1]"
+      doc:name="ign: cache remove 1" />
+    <apache-ignite:cache-remove config-ref="ignConfig" cache="#[flowVars.cache]" key-ref="#[flowVars.key2]"
+      doc:name="ign: cache remove 2" />
+    <flow-ref name="transactionalScope__transaction" doc:name="transactionalScope_transaction" />
+    <flow-ref name="transactionalScope_mkresponse" doc:name="transactionalScope_mkresponse" />
+    <choice-exception-strategy doc:name="Choice Exception Strategy">
+      <catch-exception-strategy doc:name="Catch Exception Strategy"
+        when="#[exception.causedBy(java.lang.IllegalStateException)]">
+        <flow-ref name="transactionalScope_mkresponse" doc:name="transactionalScope_mkresponse" />
+      </catch-exception-strategy>
+      <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+    </choice-exception-strategy>
+  </flow>
+
+  <flow name="transactionalScope__transaction">
+    <apache-ignite:transactional-scope manager-ref="ignite1" doc:name="Transactional - Scope">
+      <apache-ignite:cache-put config-ref="ignConfig" cache="#[flowVars.cache]" key-ref="#[flowVars.key1]"
+        value-ref="#[flowVars.val1]" doc:name="ign: cache put 1" />
+      <scripting:component doc:name="Groovy: fail?">
+        <scripting:script engine="Groovy"><![CDATA[
+          if ("true".equals(flowVars.fail)) {
+            throw new java.lang.IllegalStateException("FAIL FORCED!");
+          }
+          ]]></scripting:script>
+      </scripting:component>
+      <apache-ignite:cache-put config-ref="ignConfig" cache="#[flowVars.cache]" key-ref="#[flowVars.key2]"
+        value-ref="#[flowVars.val2]" doc:name="ign: cache put 2" />
+    </apache-ignite:transactional-scope>
+  </flow>
+
+  <flow name="transactionalScope_mkresponse">
+    <apache-ignite:cache-get config-ref="ignConfig" cache="#[flowVars.cache]" key-ref="#[flowVars.key1]"
+      doc:name="ign: cache get 1" />
+    <enricher doc:name="Message Enricher" target="#[flowVars.get2]">
+      <apache-ignite:cache-get config-ref="ignConfig" cache="#[flowVars.cache]" key-ref="#[flowVars.key2]"
+        doc:name="ign: cache get 2" />
+    </enricher>
+    <set-payload value="#[payload]-#[flowVars.get2]" doc:name="payload: t1-t2" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+  </flow>
+
+</mule>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+  xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd">
+
+  <flow name="atomicReferenceGet">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicReferenceGet" allowedMethods="POST"
+      doc:name="http-in: /atomicReferenceGet">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-reference-get doc:name="atomref: get" atomic="#[payload.atomic]"
+      mustDeserialize="#[payload.mustDeserialize]" config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="atomicReferenceSet">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicReferenceSet" allowedMethods="POST"
+      doc:name="http-in: /atomicReferenceSet">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-reference-set doc:name="atomref: set" value-ref="#[payload.value]"
+      mustSerialize="#[payload.mustSerialize]" atomic="#[payload.atomic]" config-ref="ignConfig" />
+    <set-payload value="ok!" doc:name="Set Payload" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="atomicReferenceCompareAndSet">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicReferenceCompareAndSet" allowedMethods="POST"
+      doc:name="http-in: /atomicReferenceCompareAndSet">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-reference-compare-and-set doc:name="atomref: compare-and-set"
+      expected-ref="#[payload.expected]" newValue-ref="#[payload.newValue]" mustSerialize="#[payload.mustSerialize]"
+      atomic="#[payload.atomic]" config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+</mule>

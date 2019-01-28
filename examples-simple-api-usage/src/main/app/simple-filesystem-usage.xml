@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+
+  <flow name="filesystemAppend">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemAppend" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemAppend">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <set-variable variableName="inputStream" value="#[new java.io.ByteArrayInputStream(payload.content.getBytes())]"
+      doc:name="var: inputStream" />
+    <apache-ignite:filesystem-append config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
+      content-ref="#[flowVars.inputStream]" doc:name="ign: filesystem-append" />
+    <set-payload value="{&quot;res&quot;:&quot;success!&quot;}" doc:name="payload: ok!" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemCreate">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemCreate" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemCreate">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <enricher doc:name="enrich: properties" target="#[flowVars.properties]">
+      <processor-chain doc:name="chain">
+        <set-payload value="#[payload.properties]" doc:name="payload: payload.properties" />
+        <json:json-to-object-transformer returnClass="java.util.Map" doc:name="json-to-obj: properties" />
+      </processor-chain>
+    </enricher>
+    <set-variable variableName="inputStream" value="#[new java.io.ByteArrayInputStream(payload.content.getBytes())]"
+      doc:name="var: inputStream" />
+    <apache-ignite:filesystem-create config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
+      bufferSize="#[payload.bufferSize]" blockSize="#[payload.blockSize]" overwrite="#[payload.overwrite]"
+      affinityKey="#[payload.affinityKey]" replication="#[payload.replication]" content-ref="#[flowVars.inputStream]"
+      doc:name="ign: filesystem-create">
+      <apache-ignite:properties ref="#[flowVars.properties]" />
+    </apache-ignite:filesystem-create>
+    <set-payload value="{&quot;res&quot;:&quot;success!&quot;}" doc:name="payload: ok!" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemDelete">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemDelete" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemDelete">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:filesystem-delete config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
+      recursive="#[payload.recursive]" doc:name="ign: filesystem-delete" />
+    <json:object-to-json-transformer doc:name="toJson" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemExists">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemExists" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemExists">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:filesystem-exists config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
+      doc:name="ign: filesystem-exists" />
+    <json:object-to-json-transformer doc:name="toJson" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemFormat">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemFormat" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemFormat">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:filesystem-format config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+      doc:name="ign: filesystem-format" />
+    <set-payload value="{&quot;res&quot;:&quot;success!&quot;}" doc:name="payload: ok!" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemInfo">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemInfo" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemInfo">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:filesystem-info config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
+      doc:name="ign: filesystem-info" />
+    <json:object-to-json-transformer doc:name="toJson" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemListFiles">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemListFiles" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemListFiles">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:filesystem-list-files config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+      path="#[payload.path]" doc:name="ign: filesystem-list-liles" />
+    <json:object-to-json-transformer doc:name="toJson" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemListPaths">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemListPaths" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemListPaths">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:filesystem-list-paths config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+      path="#[payload.path]" doc:name="ign: filesystem-list-paths" />
+    <json:object-to-json-transformer doc:name="toJson" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemMkdirs">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemMkdirs" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemMkdirs">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <enricher doc:name="enrich: properties" target="#[flowVars.properties]">
+      <processor-chain doc:name="chain">
+        <set-payload value="#[payload.properties]" doc:name="payload: payload.properties" />
+        <json:json-to-object-transformer returnClass="java.util.Map" doc:name="json-to-obj: properties" />
+      </processor-chain>
+    </enricher>
+    <apache-ignite:filesystem-mkdirs config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
+      doc:name="ign: filesystem-mkdirs">
+      <apache-ignite:properties ref="#[flowVars.properties]" />
+    </apache-ignite:filesystem-mkdirs>
+    <set-payload value="{&quot;res&quot;:&quot;success!&quot;}" doc:name="payload: ok!" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemOpen">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemOpen" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemOpen">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="text/plain" />
+      </http:response-builder>
+    </http:listener>
+    <enricher target="#[flowVars.stream]" doc:name="Message Enricher">
+      <apache-ignite:filesystem-open config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
+        doc:name="ign: filesystem-open" />
+    </enricher>
+    <set-payload value="#[com.hawkore.IOUtils.toString(flowVars.stream)]" doc:name="payload: read file" />
+    <apache-ignite:filesystem-close-stream stream-ref="#[flowVars.stream]" doc:name="ign: close-stream"
+      config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="toJson" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemRename">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemRename" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemRename">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="text/plain" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:filesystem-rename config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+      sourcePath="#[payload.sourcePath]" destinationPath="#[payload.destinationPath]" doc:name="ign: filesystem-open" />
+    <set-payload value="{&quot;res&quot;:&quot;success!&quot;}" doc:name="payload: ok!" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemSetTimes">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemSetTimes" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemSetTimes">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="text/plain" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:filesystem-set-times config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
+      modificationTime="#[payload.modificationTime]" accessTime="#[payload.accessTime]"
+      doc:name="ign: filesystem-set-times" />
+    <set-payload value="{&quot;res&quot;:&quot;success!&quot;}" doc:name="payload: ok!" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemSize">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemSize" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemSize">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="text/plain" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:filesystem-size config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
+      doc:name="ign: filesystem-size" />
+    <json:object-to-json-transformer doc:name="toJson" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemSummary">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemSummary" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemSummary">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="text/plain" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:filesystem-summary config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
+      doc:name="ign: filesystem-summary" />
+    <json:object-to-json-transformer doc:name="toJson" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemUpdate">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemUpdate" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemUpdate">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <enricher doc:name="enrich: properties" target="#[flowVars.properties]">
+      <processor-chain doc:name="chain">
+        <set-payload value="#[payload.properties]" doc:name="payload: payload.properties" />
+        <json:json-to-object-transformer returnClass="java.util.Map" doc:name="json-to-obj: properties" />
+      </processor-chain>
+    </enricher>
+    <apache-ignite:filesystem-update config-ref="ignConfig" fileSystem="#[payload.fileSystem]" path="#[payload.path]"
+      doc:name="ign: filesystem-update">
+      <apache-ignite:properties ref="#[flowVars.properties]" />
+    </apache-ignite:filesystem-update>
+    <json:object-to-json-transformer doc:name="toJson" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="filesystemUsedSpaceSize">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/filesystemUsedSpaceSize" allowedMethods="POST"
+      doc:name="http-in: POST /filesystemUsedSpaceSize">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:filesystem-used-space-size config-ref="ignConfig" fileSystem="#[payload.fileSystem]"
+      doc:name="ign: filesystem--used-space-size" />
+    <json:object-to-json-transformer doc:name="toJson" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+</mule>

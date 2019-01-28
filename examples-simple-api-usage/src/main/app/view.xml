@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+  <flow name="faviconFlow">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/favicon.ico" doc:name="HTTP" allowedMethods="GET">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="image/x-icon" />
+      </http:response-builder>
+    </http:listener>
+    <set-payload
+      value="#[Thread.currentThread().getContextClassLoader().getResourceAsStream(&quot;favicon.ico&quot;)]"
+      doc:name="payload: favicon.ico" />
+  </flow>
+  <flow name="viewFlow">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/view/*" doc:name="HTTP" allowedMethods="GET" />
+    <http:static-resource-handler resourceBase="${app.home}/classes/view" defaultFile="view.html"
+      doc:name="HTTP Static Resource Handler" />
+  </flow>
+</mule>

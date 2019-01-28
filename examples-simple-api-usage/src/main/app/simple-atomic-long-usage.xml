@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+  xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd">
+
+  <flow name="atomicLongGet">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicLongGet" allowedMethods="POST"
+      doc:name="http-in: /atomicLongGet">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-long-get doc:name="atomlong: get" atomic="#[payload.atomic]" config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="atomicLongAddAndGet">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicLongAddAndGet" allowedMethods="POST"
+      doc:name="http-in: /atomicLongAddAndGet">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-long-add-and-get doc:name="atomlong: add-and-get" valueToAdd="#[payload.valueToAdd]"
+      atomic="#[payload.atomic]" config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="atomicLongGetAndAdd">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicLongGetAndAdd" allowedMethods="POST"
+      doc:name="http-in: /atomicLongGetAndAdd">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-long-get-and-add doc:name="atomlong: get-and-add" valueToAdd="#[payload.valueToAdd]"
+      atomic="#[payload.atomic]" config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="atomicLongGetAndSet">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicLongGetAndSet" allowedMethods="POST"
+      doc:name="http-in: /atomicLongGetAndSet">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-long-get-and-set doc:name="atomlong: get-and-set" valueToSet="#[payload.valueToSet]"
+      atomic="#[payload.atomic]" config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="atomicLongCompareAndSet">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicLongCompareAndSet" allowedMethods="POST"
+      doc:name="http-in: /atomicLongCompareAndSet">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-long-compare-and-set doc:name="atomlong: compare-and-set" expected="#[payload.expected]"
+      newValue="#[payload.newValue]" atomic="#[payload.atomic]" config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="atomicLongDecrementAndGet">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicLongDecrementAndGet" allowedMethods="POST"
+      doc:name="http-in: /atomicLongDecrementAndGet">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-long-decrement-and-get doc:name="atomlong: decrement-and-get" atomic="#[payload.atomic]"
+      config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="atomicLongGetAndDecrement">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicLongGetAndDecrement" allowedMethods="POST"
+      doc:name="http-in: /atomicLongGetAndDecrement">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-long-get-and-decrement doc:name="atomlong: get-and-decrement" atomic="#[payload.atomic]"
+      config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="atomicLongGetAndIncrement">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicLongGetAndIncrement" allowedMethods="POST"
+      doc:name="http-in: /atomicLongGetAndIncrement">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-long-get-and-increment doc:name="atomlong: get-and-increment" atomic="#[payload.atomic]"
+      config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="atomicLongIncrementAndGet">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/atomicLongIncrementAndGet" allowedMethods="POST"
+      doc:name="http-in: /atomicLongIncrementAndGet">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-long-increment-and-get doc:name="atomlong: increment-and-get" atomic="#[payload.atomic]"
+      config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="Object to JSON" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+</mule>

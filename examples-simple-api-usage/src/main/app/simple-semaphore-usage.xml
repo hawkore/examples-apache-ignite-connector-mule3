@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+  xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+  xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+  <flow name="semaphoreInstance">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/semaphoreInstance" allowedMethods="POST"
+      doc:name="http-in: POST /semaphoreInstance">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:semaphore-instance config-ref="ignConfig" semaphore="#[payload.semaphore]"
+      doc:name="ign: semaphore-instance" />
+    <set-payload value="#[payload.getDelegate().toString()]" doc:name="payload:true" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="semaphoreAcquirePermits">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/semaphoreAcquirePermits" allowedMethods="POST"
+      doc:name="http-in: POST /semaphoreAcquirePermits">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:semaphore-acquire-permits config-ref="ignConfig" semaphore="#[payload.semaphore]"
+      permits="#[payload.permits]" timeout="#[payload.timeout]" timeoutUnit="#[payload.timeoutUnit]"
+      doc:name="ign: semaphore-acquire-permits" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="semaphoreDrainPermits">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/semaphoreDrainPermits" allowedMethods="POST"
+      doc:name="http-in: POST /semaphoreDrainPermits">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:semaphore-drain-permits config-ref="ignConfig" semaphore="#[payload.semaphore]"
+      doc:name="ign: semaphore-drain-permits" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="semaphoreResetPermits">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/semaphoreResetPermits" allowedMethods="POST"
+      doc:name="http-in: POST /semaphoreResetPermits">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:semaphore-reset-permits config-ref="ignConfig" semaphore="#[payload.semaphore]"
+      permits="#[payload.permits]" doc:name="ign: semaphore-reset-permits" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="semaphoreReleasePermits">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/semaphoreReleasePermits" allowedMethods="POST"
+      doc:name="http-in: POST /semaphoreReleasePermits">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:semaphore-release-permits config-ref="ignConfig" semaphore="#[payload.semaphore]"
+      permits="#[payload.permits]" doc:name="ign: semaphore-release-permits" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+</mule>

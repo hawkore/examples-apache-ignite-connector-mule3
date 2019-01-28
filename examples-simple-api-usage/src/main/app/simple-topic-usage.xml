@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+
+  <flow name="topicPublish">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/topicPublish" allowedMethods="POST"
+      doc:name="http-in: POST /topicPublish">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:topic-publish config-ref="ignConfig" topic="#[payload.topic]" item-ref="#[payload.item]"
+      subscribersGroup="#[payload.subscribersGroup]" doc:name="Apache Ignite: topic-publish" />
+    <set-payload value="{&quot;res&quot;:&quot;success!&quot;}" doc:name="payload:true" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="topicListener">
+    <apache-ignite:topic-listener config-ref="ignConfig" topic="TOPIC" doc:name="ign: topic-listener" />
+    <component doc:name="java: MessageReceivedHandler">
+      <singleton-object class="com.hawkore.mule.apacheignite.example.rt.MessageReceivedHandler" />
+    </component>
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+  <flow name="topicListener_retrieve">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/topicListener_retrieve" allowedMethods="POST"
+      doc:name="http-in: POST /topicListener_retrieve">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <component doc:name="java: MessagesFromQueueHandler">
+      <singleton-object class="com.hawkore.mule.apacheignite.example.rt.MessagesFromQueueHandler" />
+    </component>
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+</mule>

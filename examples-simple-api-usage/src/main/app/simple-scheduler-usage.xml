@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+
+  <flow name="schedulerSource">
+    <apache-ignite:scheduler-source config-ref="ignConfig" name="demoSchedulerSource"
+      description="Demo scheduler source" uniqueSchedulerId="demoSchedulerSource" activeOnStart="false"
+      concurrencyAllowed="false" doc:name="ign: queue-instance">
+      <apache-ignite:scheduler-strategy>
+        <apache-ignite:fixed-frequency frequency="100" startDelay="0" />
+      </apache-ignite:scheduler-strategy>
+    </apache-ignite:scheduler-source>
+    <apache-ignite:atomic-sequence-add-and-get doc:name="atomseq: add-and-get" valueToAdd="1" atomic="SEQ_SCHEDULER"
+      config-ref="ignConfig" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="schedulerSource_seq">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/schedulerSource_seq" allowedMethods="POST"
+      doc:name="http-in: POST /schedulerSource_seq">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:atomic-sequence-get doc:name="atomseq: add-and-get" atomic="SEQ_SCHEDULER" config-ref="ignConfig" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="schedulerStart">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/schedulerStart" allowedMethods="POST"
+      doc:name="http-in: POST /schedulerStart">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:scheduler-start config-ref="ignConfig" taskId="#[payload.taskId]"
+      doc:name="Apache Ignite: scheduler-start" />
+    <set-payload value="{&quot;res&quot;:&quot;success!&quot;}" doc:name="payload:true" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="schedulerStop">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/schedulerStop" allowedMethods="POST"
+      doc:name="http-in: POST /schedulerStop">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:scheduler-stop config-ref="ignConfig" taskId="#[payload.taskId]"
+      doc:name="Apache Ignite: scheduler-stop" />
+    <set-payload value="{&quot;res&quot;:&quot;success!&quot;}" doc:name="payload:true" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="schedulerReschedule">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/schedulerReschedule" allowedMethods="POST"
+      doc:name="http-in: POST /schedulerReschedule">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:scheduler-reschedule config-ref="ignConfig" taskId="#[payload.taskId]"
+      activeOnStart="#[payload.activeOnStart]" concurrencyAllowed="#[payload.concurrencyAllowed]"
+      doc:name="Apache Ignite: scheduler-reschedule">
+      <apache-ignite:scheduler-strategy>
+        <apache-ignite:fixed-frequency frequency="#[payload.frequency]" startDelay="#[payload.startDelay]" />
+      </apache-ignite:scheduler-strategy>
+    </apache-ignite:scheduler-reschedule>
+    <set-payload value="{&quot;res&quot;:&quot;success!&quot;}" doc:name="payload:true" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="schedulerRunNow">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/schedulerRunNow" allowedMethods="POST"
+      doc:name="http-in: POST /schedulerRunNow">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:scheduler-run-now config-ref="ignConfig" taskId="#[payload.taskId]"
+      doc:name="Apache Ignite: scheduler-run-now" />
+    <set-payload value="{&quot;res&quot;:&quot;success!&quot;}" doc:name="payload:true" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="schedulerTasks">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/schedulerTasks" allowedMethods="POST"
+      doc:name="http-in: POST /schedulerTasks">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:scheduler-tasks config-ref="ignConfig" doc:name="Apache Ignite: scheduler-tasks" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="schedulerRunList">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/schedulerRunList" allowedMethods="POST"
+      doc:name="http-in: POST /schedulerRunList">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:scheduler-run-list config-ref="ignConfig" taskId="#[payload.taskId]"
+      doc:name="Apache Ignite: queue-run-list" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+</mule>

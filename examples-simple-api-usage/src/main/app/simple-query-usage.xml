@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+  xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+  <flow name="initializeData">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/initializeData" allowedMethods="POST"
+      doc:name="http-in: POST /initializeData">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <component doc:name="java: cache data">
+      <singleton-object class="com.hawkore.mule.apacheignite.example.rt.CacheDataInitializerHandler" />
+    </component>
+    <apache-ignite:cache-clear config-ref="ignConfig" cache="CACHE1" doc:name="ign: clear cache" />
+    <foreach doc:name="For Each">
+      <apache-ignite:cache-put config-ref="ignConfig" cache="CACHE1" key-ref="#[payload.id]" async="true"
+        doc:name="ign: put data" />
+    </foreach>
+    <set-payload value="ok!" doc:name="payload: ok!" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="querySql">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/querySql" allowedMethods="POST"
+      doc:name="http-in: POST /querySql">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:query-sql config-ref="ignConfig" sqlQuery="#[payload.sqlQuery]"
+      distributedJoins="#[payload.distributedJoins]" replicatedOnly="#[payload.replicatedOnly]"
+      collocated="#[payload.collocated]" lazy="#[payload.lazy]" local="#[payload.local]"
+      enforceJoinOrder="#[payload.enforceJoinOrder]" timeout="#[payload.timeout]" timeoutUnit="#[payload.timeoutUnit]"
+      doc:name="ign: query-sql" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+  <flow name="queryLucene">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/queryLucene" allowedMethods="POST"
+      doc:name="http-in: POST /queryLucene">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:query-lucene tableId="#[payload.tableId]" maxResults="#[payload.maxResults]" local="#[payload.local]"
+      luceneQuery="#[payload.luceneQuery]" config-ref="ignConfig" doc:name="ign: query-lucene" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+</mule>

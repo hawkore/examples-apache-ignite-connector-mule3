@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
+  xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+  <flow name="utilsNodeConsistentId">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/utilsNodeConsistentId" allowedMethods="POST"
+      doc:name="http-in: POST /utilsNodeConsistentId">
+      <http:response-builder>
+        <http:header headerName="Content-Type" value="application/json" />
+      </http:response-builder>
+    </http:listener>
+    <apache-ignite:utils-node-consistent-id config-ref="ignConfig" doc:name="ign: utils-node-consistent-id" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+
+  <flow name="utilsIgniteInstance">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/utilsIgniteInstance" allowedMethods="POST"
+      doc:name="http-in: POST /utilsIgniteInstance" />
+    <apache-ignite:utils-ignite-instance config-ref="ignConfig" doc:name="ign: utils-ignite-instance" />
+    <set-payload value="#[payload.getDelegate().toString()]" doc:name="payload: toString()" />
+    <json:object-to-json-transformer doc:name="obj2json" />
+    <exception-strategy ref="exceptionStrategy" doc:name="Reference Exception Strategy" />
+  </flow>
+
+</mule>
