@@ -21,7 +21,7 @@
 
 		<java.version>1.8</java.version>
 		<!-- Apache Ignite 2.7.0 with Hawkore's advanced indexing -->
-		<ignite.version>2.7.2-hk</ignite.version>
+		<ignite.version>2.7.3-hk</ignite.version>
 		<!-- hk-ignite-connector stand-alone version -->
 		<hawkore.ignite.connector>2.6.0</hawkore.ignite.connector>
 
