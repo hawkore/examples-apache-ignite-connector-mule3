@@ -17,9 +17,8 @@
 
     <jdk.version>1.8</jdk.version>
 
-    <ignite.version>2.6.0</ignite.version>
-
-    <apache-ignite-connector.version>2.6.0</apache-ignite-connector.version>
+    <ignite.version>2.7.6</ignite.version>
+    <apache-ignite-connector.version>2.6.1</apache-ignite-connector.version>
   </properties>
 
   <build>
@@ -155,6 +154,10 @@
   </dependencies>
 
   <repositories>
+    <repository>
+      <id>Hawkore Repository</id>
+      <url>https://repository.hawkore.com/maven2/</url>
+    </repository>
     <repository>
       <id>Central</id>
       <name>Central</name>

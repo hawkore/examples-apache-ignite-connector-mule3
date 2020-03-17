@@ -7,7 +7,7 @@
         http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context.xsd        
+        http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util.xsd">
 
@@ -52,7 +52,7 @@
 
 	<bean class="org.apache.ignite.configuration.IgniteConfiguration">
 		<property name="gridName" value="example" />
-		<property name="clientMode" value="true" />
+		<property name="clientMode" value="false" />
 		<property name="workDirectory"
 			value="${java.io.tmpdir}/clients/exampleMule3Client/work" />
 		<property name="binaryConfiguration">
@@ -102,7 +102,7 @@
 		<property name="cacheMode" value="PARTITIONED" />
 		<property name="indexedTypes">
 			<array>
-				<!-- this tuple (key, value) will create a table named poi within "pois" 
+				<!-- this tuple (key, value) will create a table named poi within "pois"
 					cache -->
 				<value>com.hawkore.ignite.examples.entities.pois.PoiKey</value>
 				<value>com.hawkore.ignite.examples.entities.pois.Poi</value>

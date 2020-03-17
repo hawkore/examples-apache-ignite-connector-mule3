@@ -22,11 +22,7 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
                 <http:header headerName="Content-Type" value="application/json"/>
             </http:response-builder>
 		</http:listener>
-		<apache-ignite:query-sql doc:name="create sqlQuery"  config-ref="Apache_Ignite_Config" queryParams-ref="#[[message.inboundProperties['http.query.params'].lang, message.inboundProperties['http.query.params'].lang, message.inboundProperties['http.uri.params'].ID]]" sqlQuery="SELECT id, 
-countryCode, 
-public.hkmv_text(name, ?, public.HKMV_DEFAULT_ISO(name)) as name, public.hkmv_text(description, ?, public.HKMV_DEFAULT_ISO(description)) as description, public.hkmv_text(name, 'iata', null) as iata 
-FROM &quot;pois&quot;.poi  WHERE id = ?">
-		</apache-ignite:query-sql>
+        <apache-ignite:query-sql config-ref="Apache_Ignite_Config" sqlQuery="SELECT id,  countryCode,  public.hkmv_text(name, ?, public.HKMV_DEFAULT_ISO(name)) as name, public.hkmv_text(description, ?, public.HKMV_DEFAULT_ISO(description)) as description, public.hkmv_text(name, 'iata', null) as iata  FROM &quot;pois&quot;.poi  WHERE id = ?" queryParams-ref="#[[message.inboundProperties['http.query.params'].lang, message.inboundProperties['http.query.params'].lang, message.inboundProperties['http.uri.params'].ID]]" doc:name="create sqlQuery"/>
         <json:object-to-json-transformer doc:name="Object to JSON"/>
 	</flow>
 	<flow name="queriesDeletePoiByID"  >
