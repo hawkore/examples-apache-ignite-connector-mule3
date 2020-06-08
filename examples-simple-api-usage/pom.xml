@@ -17,8 +17,8 @@
 
     <jdk.version>1.8</jdk.version>
 
-    <ignite.version>2.7.6</ignite.version>
-    <apache-ignite-connector.version>2.6.1</apache-ignite-connector.version>
+    <ignite.version>2.8.1</ignite.version>
+    <apache-ignite-connector.version>2.7.0</apache-ignite-connector.version>
   </properties>
 
   <build>

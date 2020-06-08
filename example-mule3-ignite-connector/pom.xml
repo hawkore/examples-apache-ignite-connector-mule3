@@ -9,6 +9,11 @@
   <packaging>mule</packaging>
   <name>Mule example-mule3-ignite-connector Application</name>
 
+  <organization>
+    <name>HAWKORE, S.L.</name>
+    <url>https://www.hawkore.com</url>
+  </organization>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -24,7 +29,7 @@
     <!-- Apache Ignite 2.7.0 with Hawkore's advanced indexing -->
     <ignite.version>2.7.6-hk</ignite.version>
     <!-- hk-ignite-connector stand-alone version -->
-    <hawkore.ignite.connector>2.6.1</hawkore.ignite.connector>
+    <hawkore.ignite.connector>2.7.0</hawkore.ignite.connector>
 
   </properties>
 

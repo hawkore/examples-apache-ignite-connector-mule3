@@ -1,6 +1,6 @@
 # Hawkore's Apache Ignite connector for Mule 3
 
-_[Apache Ignite(TM)](https://ignite.apache.org) is a memory-centric distributed database, caching, and processing platform for
+_[Apache Ignite®](https://ignite.apache.org) is a memory-centric distributed database, caching, and processing platform for
 transactional, analytical, and streaming workloads, delivering in-memory speeds at petabyte scale._
 
 ![connector](assets/connector.png)
@@ -16,7 +16,7 @@ With this connector you can integrate, into your Mule applications, Apache Ignit
 - SQL and Lucene based queries over caches' data.
 - Transactional and cache scopes.
 - Distributed scheduler.
-- Distributes batches.
+- Distributed batches.
 - Topic based Messaging
 - Queue based Messaging
 - ...
@@ -33,15 +33,17 @@ With this connector you can integrate, into your Mule applications, Apache Ignit
 	-  Change to directory: `cd examples-apache-ignite-connector-mule3`
 
 
-## Content
+## Simple API usage
+
+* `examples-simple-api-usage`: This examples wraps most connector operations and lets you invoke them by
+using very simple web forms. See [README.md](examples-simple-api-usage/README.md).
+
+# Additional examples
 
 * `ignite-server-node-test`: Server nodes to test Hawkore's Apache Ignite connector. See [README.md](ignite-server-node-test/README.md) for more info.
 
 * `example-mule3-ignite-connector`: Mule 3 application to test [Hawkore's Apache Ignite connector for Mule 3
 ](https://docs.hawkore.com/private/apache-ignite-connector-mule3/). See [README.md](example-mule3-ignite-connector/README.md) for more info.
-
-* `examples-simple-api-usage`: This examples wraps most connector operations and lets you invoke them by
-using very simple web forms. See [README.md](examples-simple-api-usage/README.md).
 
 # Other resources
 
