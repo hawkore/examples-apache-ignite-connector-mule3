@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule 
-	xmlns:json="http://www.mulesoft.org/schema/mule/json" 
-	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" 
-	xmlns:spring="http://www.springframework.org/schema/beans" 
+<mule
+	xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:spring="http://www.springframework.org/schema/beans"
 	xmlns:apache-ignite="http://www.mulesoft.org/schema/mule/apache-ignite"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http" 
-	xmlns="http://www.mulesoft.org/schema/mule/core" 
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/apache-ignite http://www.mulesoft.org/schema/mule/apache-ignite/current/mule-apache-ignite.xsd
@@ -18,7 +18,7 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 
 
 	<flow name="SchedulerSource"  >
-		<apache-ignite:scheduler-source doc:name="Scheduler - source"  config-ref="Apache_Ignite_Config" uniqueSchedulerId="a_scheduler_1" description="My cron scheduler 1">
+		<apache-ignite:scheduler-source doc:name="Scheduler - source"  config-ref="Apache_Ignite_Config" description="My cron scheduler 1">
 			<apache-ignite:scheduler-strategy >
 				<apache-ignite:cron />
 			</apache-ignite:scheduler-strategy>
@@ -27,7 +27,7 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 
 		<logger level="INFO" doc:name="Logger"  message="#['scheduler dispatch this task']"/>
 	</flow>
-	
+
 	<flow name="schedulerTasks"  >
 		<http:listener doc:name="Listener"  config-ref="HTTP_Listener_config" path="/scheduler/tasks"/>
 		<apache-ignite:scheduler-tasks doc:name="Scheduler - task configs"  config-ref="Apache_Ignite_Config"/>
